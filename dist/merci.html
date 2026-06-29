@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merci — VIGIE 974</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#0A1F2B;--abyss-2:#0E2C3A;--deep:#103442;--line:#1E4150;
+  --ember:#FF5A3C;--sand:#F2E9DC;--sand-soft:#D8CFC2;--mist:#8FA9B0;--signal:#5FD0A8;
+  --display:'Bricolage Grotesque',sans-serif;--body:'Instrument Sans',sans-serif;--mono:'Space Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--body);background:var(--abyss);color:var(--sand);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+::selection{background:var(--ember);color:var(--abyss)}
+
+header{border-bottom:1px solid var(--line);background:rgba(10,31,43,.82);backdrop-filter:blur(10px)}
+.nav{max-width:1140px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:700;letter-spacing:.08em}
+.mark{width:30px;height:30px;border:1.5px solid var(--ember);border-radius:50%;display:grid;place-items:center;position:relative;flex-shrink:0}
+.mark::before{content:"";width:7px;height:7px;background:var(--ember);border-radius:50%}
+.mark::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border-top:1.5px solid transparent;border-right:1.5px solid var(--ember);animation:sweep 3.2s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.brand small{color:var(--mist);font-weight:400;font-size:11px;letter-spacing:.16em}
+
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 24px}
+.card{width:100%;max-width:540px;text-align:center}
+.seal{width:88px;height:88px;margin:0 auto 28px;border:2px solid var(--signal);border-radius:50%;display:grid;place-items:center;color:var(--signal);font-size:40px;position:relative}
+.seal::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid var(--signal);opacity:.25;animation:ping 2.6s infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.25}70%{transform:scale(1.25);opacity:0}100%{opacity:0}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--ember)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,44px);line-height:1.02;letter-spacing:-.02em;margin:14px 0 16px}
+.lede{color:var(--sand-soft);font-size:17px;margin-bottom:32px}
+.lede b{color:var(--sand)}
+
+.recap{border:1px solid var(--line);border-radius:4px;background:var(--abyss-2);padding:8px 22px;margin-bottom:26px;text-align:left}
+.recap-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--mist)}
+.recap-row:last-child{border-bottom:none}
+.recap-row b{font-family:var(--mono);color:var(--sand)}
+.recap-row .ref{font-size:12px;color:var(--mist)}
+
+.steps{text-align:left;list-style:none;margin:0 0 30px}
+.steps li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:14px;color:var(--sand-soft)}
+.steps li::before{content:"✓";color:var(--signal);font-family:var(--mono);font-weight:700;margin-top:1px}
+
+.note{font-family:var(--mono);font-size:12px;color:var(--mist);line-height:1.7;border-top:1px solid var(--line);padding-top:20px;margin-bottom:28px}
+.note b{color:var(--ember)}
+
+.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.02em;padding:15px 26px;border-radius:2px;cursor:pointer;text-decoration:none;text-transform:uppercase;border:1px solid var(--line);color:var(--sand);transition:border-color .15s,transform .15s}
+.btn:hover{border-color:var(--ember);color:var(--ember);transform:translateY(-2px)}
+
+footer{border-top:1px solid var(--line);padding:26px 24px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--mist)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="brand"><span class="mark"></span> VIGIE&nbsp;974 <small>· 974</small></div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="seal">✓</div>
+    <span class="eyebrow">Paiement confirmé</span>
+    <h1>Votre base part par email.</h1>
+    <p class="lede">Merci. Votre commande est validée — le fichier vous est envoyé à <b id="email">votre adresse</b> dans les prochaines minutes.</p>
+
+    <div class="recap">
+      <div class="recap-row"><span>Contacts commandés</span><b id="qty">—</b></div>
+      <div class="recap-row"><span>Secteur</span><b id="zone">—</b></div>
+      <div class="recap-row"><span>Référence</span><span class="ref" id="ref">—</span></div>
+    </div>
+
+    <ul class="steps">
+      <li>Le CSV s'ouvre dans Excel ou Google Sheets, colonnes de suivi déjà prêtes.</li>
+      <li>Coordonnées complètes incluses : civilité, nom, téléphone, ville, secteur.</li>
+      <li>Scripts de prise de contact et relance fournis dans l'email.</li>
+    </ul>
+
+    <p class="note">
+      Rien reçu d'ici 10 minutes ? <b>Vérifiez vos spams</b>, puis écrivez-nous en répondant simplement à l'email.<br>
+      Prospection responsable : informez les personnes contactées de l'origine des données et respectez leur droit d'opposition.
+    </p>
+
+    <a class="btn" href="/">← Retour à l'accueil</a>
+  </div>
+</main>
+
+<footer>VIGIE 974 — base propriétaires location courte durée · La Réunion</footer>
+
+<script>
+/* Affiche la référence de session Stripe si présente dans l'URL.
+   Pour montrer le détail exact (contacts, secteur), faites un petit appel
+   à votre backend qui lit la session via session_id ; ici on reste statique. */
+(function(){
+  var p=new URLSearchParams(location.search);
+  var sid=p.get('session_id');
+  if(sid){ document.getElementById('ref').textContent=sid.slice(0,18)+'…'; }
+  // Optionnel : si vous passez aussi ?qty= & ?zone= & ?email= dans success_url
+  ['qty','zone','email'].forEach(function(k){
+    var v=p.get(k); if(v){ document.getElementById(k).textContent=decodeURIComponent(v); }
+  });
+})();
+</script>
+</body>
+</html>
