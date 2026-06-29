@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIGIE 974 — Repérez vos propriétaires Airbnb avant vos concurrents</title>
+<meta name="description" content="Base qualifiée de propriétaires de locations courte durée à La Réunion. Prête à prospecter : secteurs, potentiel, scripts, suivi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#0A1F2B;
+  --abyss-2:#0E2C3A;
+  --deep:#103442;
+  --line:#1E4150;
+  --ember:#FF5A3C;
+  --ember-dim:#C9432B;
+  --sand:#F2E9DC;
+  --sand-soft:#D8CFC2;
+  --mist:#8FA9B0;
+  --signal:#5FD0A8;
+  --display:'Bricolage Grotesque',sans-serif;
+  --body:'Instrument Sans',sans-serif;
+  --mono:'Space Mono',monospace;
+  --maxw:1140px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:var(--abyss);
+  color:var(--sand);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--ember);color:var(--abyss)}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);letter-spacing:.04em}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ember);
+}
+.section{padding:96px 0;position:relative}
+.section-head{max-width:680px;margin-bottom:48px}
+.section-head h2{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(28px,4.2vw,44px);
+  line-height:1.05;
+  letter-spacing:-.02em;
+  margin-top:14px;
+}
+.section-head p{color:var(--mist);font-size:17px;margin-top:16px}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-weight:700;font-size:14px;
+  letter-spacing:.02em;
+  padding:16px 26px;border-radius:2px;cursor:pointer;border:1px solid transparent;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  text-transform:uppercase;
+}
+.btn-primary{background:var(--ember);color:var(--abyss);box-shadow:0 0 0 0 rgba(255,90,60,.5)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(255,90,60,.6)}
+.btn-ghost{background:transparent;color:var(--sand);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--sand);transform:translateY(-2px)}
+.btn-block{width:100%;justify-content:center}
+
+/* ===== HEADER ===== */
+header{
+  position:sticky;top:0;z-index:60;
+  background:rgba(10,31,43,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:700;letter-spacing:.08em}
+.brand .mark{
+  width:30px;height:30px;border:1.5px solid var(--ember);border-radius:50%;
+  display:grid;place-items:center;position:relative;flex-shrink:0;
+}
+.brand .mark::before{content:"";width:7px;height:7px;background:var(--ember);border-radius:50%}
+.brand .mark::after{
+  content:"";position:absolute;inset:-1.5px;border-radius:50%;
+  border-top:1.5px solid transparent;border-right:1.5px solid var(--ember);
+  animation:sweep 3.2s linear infinite;
+}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.brand small{color:var(--mist);font-weight:400;font-size:11px;letter-spacing:.16em}
+.nav-right{display:flex;align-items:center;gap:18px}
+.nav-status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--mist);letter-spacing:.08em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 0 rgba(95,208,168,.6);animation:ping 2.4s infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(95,208,168,.5)}70%{box-shadow:0 0 0 7px rgba(95,208,168,0)}100%{box-shadow:0 0 0 0 rgba(95,208,168,0)}}
+.nav .btn{padding:11px 18px}
+@media(max-width:720px){.nav-status{display:none}}
+
+/* ===== HERO ===== */
+.hero{position:relative;padding:74px 0 88px;overflow:hidden}
+.hero-map{
+  position:absolute;right:-6%;top:50%;transform:translateY(-50%);
+  width:62%;max-width:760px;opacity:.5;pointer-events:none;z-index:0;
+}
+.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+.hero h1{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(38px,6vw,68px);line-height:.98;letter-spacing:-.03em;margin:20px 0 0;
+}
+.hero h1 em{font-style:normal;color:var(--ember)}
+.hero .lede{color:var(--sand-soft);font-size:19px;max-width:520px;margin-top:22px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.hero-trust{
+  display:flex;gap:26px;flex-wrap:wrap;margin-top:34px;
+  font-family:var(--mono);font-size:12px;color:var(--mist);letter-spacing:.04em;
+}
+.hero-trust b{color:var(--sand);font-weight:700}
+
+/* countdown */
+.window{
+  margin-top:30px;border:1px solid var(--line);border-radius:3px;
+  background:linear-gradient(180deg,rgba(255,90,60,.06),transparent);
+  padding:16px 18px;max-width:460px;
+}
+.window-label{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ember);display:flex;align-items:center;gap:8px}
+.window-label .dot{background:var(--ember)}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(255,90,60,.5)}70%{box-shadow:0 0 0 7px rgba(255,90,60,0)}100%{box-shadow:0 0 0 0 rgba(255,90,60,0)}}
+.window .dot{animation:ping 2s infinite}
+.clock{display:flex;gap:10px;margin-top:12px}
+.clock-cell{flex:1;text-align:center;background:var(--abyss-2);border:1px solid var(--line);border-radius:2px;padding:10px 4px}
+.clock-cell b{font-family:var(--mono);font-weight:700;font-size:26px;color:var(--sand);display:block;line-height:1}
+.clock-cell span{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--mist);text-transform:uppercase}
+
+/* ===== DOSSIER (signature) ===== */
+.dossier{
+  position:relative;z-index:2;
+  background:var(--abyss-2);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7);
+  overflow:hidden;
+}
+.dossier::after{ /* scan line */
+  content:"";position:absolute;left:0;right:0;height:64px;top:-64px;
+  background:linear-gradient(180deg,transparent,rgba(95,208,168,.14),transparent);
+  animation:scan 4.4s ease-in-out infinite;pointer-events:none;
+}
+@keyframes scan{0%{top:-64px}55%{top:100%}100%{top:100%}}
+.dossier-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--deep)}
+.dossier-top .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mist)}
+.dossier-top .ref{font-family:var(--mono);font-size:11px;color:var(--ember)}
+.dossier table{width:100%;border-collapse:collapse;font-size:13px}
+.dossier th{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mist);text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);font-weight:400;
+}
+.dossier td{padding:13px 16px;border-bottom:1px solid rgba(30,65,80,.5)}
+.dossier tr:last-child td{border-bottom:none}
+.dossier .city{font-weight:600}
+.pot{font-family:var(--mono);font-size:11px;display:inline-flex;align-items:center;gap:6px;color:var(--signal)}
+.pot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--signal)}
+.redact{position:relative}
+.redact span{
+  display:inline-block;height:12px;border-radius:1px;
+  background:repeating-linear-gradient(90deg,#06151d,#06151d 6px,#0b1f29 6px,#0b1f29 12px);
+  vertical-align:middle;
+}
+.dossier-foot{padding:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--deep);border-top:1px solid var(--line)}
+.dossier-foot .locked{font-family:var(--mono);font-size:11px;color:var(--mist);display:flex;align-items:center;gap:8px}
+
+/* ===== PROBLEM ===== */
+.problem{background:var(--abyss-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cost-list{display:grid;gap:0;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.cost-row{display:grid;grid-template-columns:64px 1fr;gap:0;align-items:stretch;border-bottom:1px solid var(--line)}
+.cost-row:last-child{border-bottom:none}
+.cost-row .n{font-family:var(--mono);font-size:13px;color:var(--ember);display:grid;place-items:center;background:var(--deep);border-right:1px solid var(--line)}
+.cost-row .c{padding:20px 22px}
+.cost-row h3{font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.01em}
+.cost-row p{color:var(--mist);font-size:15px;margin-top:4px}
+.problem-punch{
+  margin-top:34px;font-family:var(--display);font-weight:600;
+  font-size:clamp(20px,2.6vw,26px);line-height:1.3;letter-spacing:-.01em;
+}
+.problem-punch em{font-style:normal;color:var(--ember)}
+
+/* ===== SOLUTION ===== */
+.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.feat{border:1px solid var(--line);border-radius:4px;padding:24px;background:var(--abyss-2);transition:border-color .15s,transform .15s}
+.feat:hover{border-color:var(--ember);transform:translateY(-3px)}
+.feat .ico{font-family:var(--mono);font-size:11px;color:var(--signal);letter-spacing:.1em;display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.feat .ico::before{content:"✓";color:var(--signal);font-weight:700}
+.feat h4{font-family:var(--display);font-weight:600;font-size:17px;margin-bottom:6px}
+.feat p{color:var(--mist);font-size:14px}
+
+/* ===== APERÇU / big dossier ===== */
+.preview{background:var(--abyss-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.preview-note{font-family:var(--mono);font-size:12px;color:var(--mist);margin-top:18px;display:flex;align-items:center;gap:10px}
+
+/* ===== TESTIMONIALS ===== */
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.quote{border:1px solid var(--line);border-left:2px solid var(--ember);border-radius:4px;padding:26px;background:var(--abyss-2)}
+.quote p{font-size:15px;color:var(--sand-soft);font-style:italic}
+.quote .who{margin-top:18px;font-family:var(--mono);font-size:12px;color:var(--sand);letter-spacing:.02em}
+.quote .role{font-family:var(--mono);font-size:11px;color:var(--mist)}
+
+/* ===== ROI ===== */
+.roi-card{border:1px solid var(--line);border-radius:4px;background:var(--abyss-2);padding:38px;max-width:760px}
+.roi-card h3{font-family:var(--display);font-weight:600;font-size:22px;color:var(--ember);margin-bottom:18px}
+.roi-list{list-style:none;margin:6px 0 26px}
+.roi-list li{padding:12px 0;border-bottom:1px solid var(--line);font-size:15px;display:flex;gap:12px;align-items:baseline}
+.roi-list li:last-child{border-bottom:none}
+.roi-list li b{font-family:var(--mono);color:var(--signal);font-size:13px}
+.roi-quote{font-family:var(--display);font-weight:600;font-size:clamp(18px,2.4vw,23px);line-height:1.3;letter-spacing:-.01em;border-left:2px solid var(--ember);padding-left:18px}
+.roi-quote em{font-style:normal;color:var(--ember)}
+
+/* ===== OFFRE / CURSEUR ===== */
+.offer{max-width:680px;margin:0 auto;border:1px solid var(--line);border-radius:4px;background:var(--abyss-2);padding:34px}
+.offer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:16px}
+.offer-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.offer-qty{font-family:var(--display);font-weight:800;font-size:46px;letter-spacing:-.02em;line-height:1;margin-top:4px}
+.offer-qty small{font-family:var(--mono);font-size:13px;color:var(--mist);font-weight:400;margin-left:8px}
+.offer-disc{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--abyss);background:var(--signal);padding:7px 13px;border-radius:2px;white-space:nowrap}
+.slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:var(--line);outline:none;margin:6px 0 2px}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--ember);cursor:pointer;border:4px solid var(--abyss-2);box-shadow:0 0 0 1px var(--ember)}
+.slider::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--ember);cursor:pointer;border:4px solid var(--abyss-2);box-shadow:0 0 0 1px var(--ember)}
+.slider-ticks{display:flex;gap:8px;margin:16px 0 24px;flex-wrap:wrap}
+.slider-ticks button{font-family:var(--mono);font-size:12px;color:var(--sand);background:var(--abyss);border:1px solid var(--line);border-radius:2px;padding:9px 13px;cursor:pointer;transition:border-color .15s,color .15s}
+.slider-ticks button:hover{border-color:var(--ember);color:var(--ember)}
+.offer-calc{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;margin-bottom:24px}
+.calc-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;font-size:15px;color:var(--sand-soft)}
+.calc-row b{font-family:var(--mono)}
+.calc-row.total{padding-top:14px;margin-top:6px;border-top:1px dashed var(--line)}
+.calc-row.total span{font-family:var(--display);font-weight:600;font-size:18px;color:var(--sand)}
+.calc-row.total b{font-family:var(--display);font-weight:800;font-size:30px;color:var(--ember)}
+.offer-note{text-align:center;font-family:var(--mono);font-size:11px;color:var(--mist);margin-top:14px}
+
+/* ===== CHECKOUT ===== */
+.checkout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;max-width:860px;margin:0 auto;align-items:start}
+.co-summary,.co-pay{border:1px solid var(--line);border-radius:4px;background:var(--abyss-2);padding:28px}
+.co-pay{background:linear-gradient(180deg,rgba(255,90,60,.08),var(--abyss-2));border-color:var(--ember)}
+.checkout h3{font-family:var(--display);font-weight:800;font-size:19px;margin-bottom:18px}
+.co-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--sand-soft);gap:14px}
+.co-row b{font-family:var(--mono)}
+.co-row.total{border-bottom:none;border-top:1px dashed var(--line);margin-top:6px;padding-top:14px}
+.co-row.total span{font-family:var(--display);font-weight:600;font-size:16px;color:var(--sand)}
+.co-row.total b{font-family:var(--display);font-weight:800;font-size:25px;color:var(--ember)}
+.co-small{font-family:var(--mono);font-size:11px;color:var(--mist);margin-top:14px;line-height:1.6}
+.co-pay-note{color:var(--mist);font-size:13px;margin-bottom:20px;line-height:1.6}
+.co-trust{text-align:center;font-family:var(--mono);font-size:11px;color:var(--signal);margin-top:14px}
+
+/* ===== RÉVÉLATION MASQUÉE ===== */
+.reveal{border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:22px 0 14px;text-align:left}
+.reveal table{width:100%;border-collapse:collapse;font-size:13px}
+.reveal th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mist);text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);font-weight:400}
+.reveal td{padding:13px 14px;border-bottom:1px solid rgba(30,65,80,.5);vertical-align:middle}
+.reveal tr:last-child td{border-bottom:none}
+.reveal-foot{font-family:var(--mono);font-size:11px;color:var(--mist);margin-bottom:22px}
+
+/* bonuses */
+.bonus{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.bonus span{font-family:var(--mono);font-size:12px;color:var(--sand-soft);border:1px solid var(--line);border-radius:2px;padding:9px 13px;background:var(--abyss-2)}
+.bonus b{color:var(--ember)}
+
+/* ===== ZONES ===== */
+.zones{background:var(--abyss-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.zone{border:1px solid var(--line);border-radius:3px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;background:var(--abyss)}
+.zone .z-name{font-family:var(--mono);font-size:13px;letter-spacing:.04em}
+.zone .z-stat{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:2px}
+.z-open{color:var(--signal);border:1px solid rgba(95,208,168,.4)}
+.z-low{color:var(--ember);border:1px solid rgba(255,90,60,.4)}
+.z-closed{color:var(--mist);border:1px solid var(--line)}
+
+/* ===== GUARANTEE ===== */
+.guard{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:center}
+.seal{
+  aspect-ratio:1;border:1px solid var(--line);border-radius:4px;
+  background:radial-gradient(circle at 50% 35%,rgba(255,90,60,.12),transparent 60%),var(--abyss-2);
+  display:grid;place-content:center;text-align:center;gap:6px;padding:30px;
+}
+.seal .big{font-family:var(--display);font-weight:800;font-size:54px;line-height:1;color:var(--ember)}
+.seal small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--mist);text-transform:uppercase}
+.guard-list{list-style:none}
+.guard-list li{padding:16px 0;border-bottom:1px solid var(--line)}
+.guard-list li:last-child{border-bottom:none}
+.guard-list b{display:block;font-family:var(--mono);font-size:13px;color:var(--signal);letter-spacing:.04em;margin-bottom:3px}
+.guard-list b::before{content:"✓ "}
+.guard-list span{color:var(--mist);font-size:14px}
+
+/* ===== FAQ ===== */
+.faq-item{border:1px solid var(--line);border-radius:3px;margin-bottom:10px;overflow:hidden;background:var(--abyss-2)}
+.faq-q{width:100%;text-align:left;background:none;border:none;color:var(--sand);font-family:var(--body);font-weight:600;font-size:16px;padding:20px 22px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq-q .pm{font-family:var(--mono);color:var(--ember);font-size:20px;flex-shrink:0;transition:transform .25s}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-a div{padding:0 22px 22px;color:var(--mist);font-size:15px}
+.faq-item.open .faq-a{max-height:420px}
+.faq-item.open .pm{transform:rotate(45deg)}
+
+/* ===== FORM ===== */
+.form-sec{background:var(--abyss-2);border-top:1px solid var(--line)}
+.form-card{max-width:620px;margin:0 auto;border:1px solid var(--line);border-radius:4px;background:var(--abyss);padding:40px;box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.form-card h2{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em;text-align:center}
+.form-card .sub{text-align:center;color:var(--mist);margin:8px 0 28px;font-size:15px}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mist);margin-bottom:7px}
+.field input,.field select{
+  width:100%;padding:13px 14px;background:var(--abyss-2);border:1px solid var(--line);border-radius:2px;
+  color:var(--sand);font-family:var(--body);font-size:15px;transition:border-color .15s;
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--ember)}
+.field input::placeholder{color:#4f6873}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-note{text-align:center;font-family:var(--mono);font-size:11px;color:var(--mist);margin-top:14px;line-height:1.7}
+.ok{display:none;text-align:center;padding:30px 10px}
+.ok.show{display:block}
+.ok .check{width:54px;height:54px;border:2px solid var(--signal);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;color:var(--signal);font-size:26px}
+.ok h3{font-family:var(--display);font-weight:800;font-size:24px;margin-bottom:8px}
+.ok p{color:var(--mist);font-size:15px}
+
+/* ===== FINAL ===== */
+.final{text-align:center;position:relative;overflow:hidden}
+.final h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,5vw,52px);line-height:1;letter-spacing:-.03em;max-width:800px;margin:0 auto}
+.final p{color:var(--mist);font-size:17px;max-width:560px;margin:20px auto 32px}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);font-size:12px;color:var(--mist)}
+.foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+.foot-grid a:hover{color:var(--ember)}
+.disclaimer{margin-top:22px;padding-top:22px;border-top:1px solid var(--line);color:#5b757f;font-size:11px;line-height:1.8;max-width:760px}
+
+/* responsive */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .hero-map{display:none}
+  .feat-grid,.quotes{grid-template-columns:1fr 1fr}
+  .checkout{grid-template-columns:1fr}
+  .guard{grid-template-columns:1fr;gap:28px}
+  .seal{max-width:240px;margin:0 auto}
+}
+@media(max-width:600px){
+  .section{padding:64px 0}
+  .feat-grid,.quotes,.grid-2{grid-template-columns:1fr}
+  .form-card{padding:26px}
+  .clock-cell b{font-size:21px}
+  .cost-row{grid-template-columns:48px 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <span class="mark"></span>
+      VIGIE&nbsp;974 <small>· 974</small>
+    </div>
+    <div class="nav-right">
+      <div class="nav-status"><span class="dot"></span> SECTEURS&nbsp;OUVERTS&nbsp;: 3/4</div>
+      <button class="btn btn-primary" onclick="goForm()">Recevoir l'extrait</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <svg class="hero-map" viewBox="0 0 600 560" fill="none" aria-hidden="true">
+    <g stroke="#1E4150" stroke-width="1.2" fill="none" opacity="0.9">
+      <path d="M300 70 C420 70 510 150 520 270 C528 380 450 480 320 500 C200 518 90 450 78 330 C68 220 160 80 300 70Z"/>
+      <path d="M300 120 C400 122 470 188 478 280 C485 365 422 442 318 458 C218 472 130 414 122 322 C115 232 188 122 300 120Z"/>
+      <path d="M300 170 C375 174 428 226 434 292 C440 352 392 408 312 420 C236 430 172 386 166 314 C160 246 218 172 300 170Z"/>
+      <path d="M298 222 C348 226 386 262 390 306 C394 348 360 384 306 392 C256 398 214 368 210 320 C206 274 246 222 298 222Z"/>
+    </g>
+    <g font-family="Space Mono, monospace" font-size="11" fill="#5FD0A8">
+      <circle cx="172" cy="300" r="4" fill="#FF5A3C"/><text x="118" y="296" fill="#8FA9B0">OUEST</text>
+      <circle cx="300" cy="430" r="4" fill="#FF5A3C"/><text x="262" y="452" fill="#8FA9B0">SUD</text>
+      <circle cx="340" cy="150" r="4" fill="#FF5A3C"/><text x="356" y="146" fill="#8FA9B0">NORD</text>
+      <circle cx="448" cy="300" r="4" fill="#5FD0A8"/><text x="462" y="296" fill="#8FA9B0">EST</text>
+    </g>
+  </svg>
+
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Dossier de prospection · Location courte durée · La Réunion</span>
+      <h1>Vos prochains mandats Airbnb sont&nbsp;<em>déjà repérés.</em></h1>
+      <p class="lede">Une base qualifiée de propriétaires de locations courte durée à La Réunion. Secteur, potentiel, source : tout est trié. Vous ne cherchez plus — vous contactez.</p>
+
+      <div class="window">
+        <div class="window-label"><span class="dot"></span> Fenêtre d'accès à tarif de lancement</div>
+        <div class="clock">
+          <div class="clock-cell"><b id="d">00</b><span>Jours</span></div>
+          <div class="clock-cell"><b id="h">00</b><span>Heures</span></div>
+          <div class="clock-cell"><b id="m">00</b><span>Min</span></div>
+          <div class="clock-cell"><b id="s">00</b><span>Sec</span></div>
+        </div>
+      </div>
+
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="goForm()">Recevoir l'extrait gratuit →</button>
+        <a class="btn btn-ghost" href="#offres">Voir les offres</a>
+      </div>
+
+      <div class="hero-trust">
+        <span><b>4</b> secteurs couverts</span>
+        <span><b>218</b> propriétaires recensés</span>
+        <span>MAJ <b>juin 2026</b></span>
+      </div>
+    </div>
+
+    <!-- DOSSIER signature -->
+    <div class="dossier" id="dossier-hero">
+      <div class="dossier-top">
+        <span class="tag">EXTRAIT — ACCÈS RESTREINT</span>
+        <span class="ref mono">RÉF. 974-LCD</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Secteur</th><th>Ville</th><th>Vérifié</th><th>Contact</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono" style="color:var(--ember)">Nord</td><td class="city">Saint-Denis</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr><td class="mono" style="color:var(--ember)">Sud</td><td class="city">Saint-Pierre</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr><td class="mono" style="color:var(--ember)">Ouest</td><td class="city">Saint-Paul</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr class="redact"><td><span style="width:48px"></span></td><td><span style="width:120px"></span></td><td><span style="width:64px"></span></td><td><span style="width:70px"></span></td></tr>
+          <tr class="redact"><td><span style="width:40px"></span></td><td><span style="width:130px"></span></td><td><span style="width:64px"></span></td><td><span style="width:70px"></span></td></tr>
+          <tr class="redact"><td><span style="width:52px"></span></td><td><span style="width:100px"></span></td><td><span style="width:64px"></span></td><td><span style="width:70px"></span></td></tr>
+        </tbody>
+      </table>
+      <div class="dossier-foot">
+        <span class="locked">🔒 215 entrées masquées</span>
+        <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section problem">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Le coût réel de la prospection à l'aveugle</span>
+      <h2>Chercher des propriétaires un par un, c'est payer en temps.</h2>
+    </div>
+    <div class="cost-list">
+      <div class="cost-row"><div class="n">01</div><div class="c"><h3>Des heures à éplucher les annonces</h3><p>Une par une, sans savoir lesquelles valent un appel.</p></div></div>
+      <div class="cost-row"><div class="n">02</div><div class="c"><h3>Aucun ciblage par zone</h3><p>Vous contactez au hasard, sans repère de rentabilité.</p></div></div>
+      <div class="cost-row"><div class="n">03</div><div class="c"><h3>Des pistes éparpillées</h3><p>Notes, captures, onglets — rien pour suivre ni relancer.</p></div></div>
+      <div class="cost-row"><div class="n">04</div><div class="c"><h3>Les concurrents passent devant</h3><p>Pendant que vous triez, un autre signe déjà le mandat.</p></div></div>
+    </div>
+    <p class="problem-punch">La prospection ne devrait pas commencer par 15 heures de recherche.<br><em>Elle devrait commencer par une liste claire de qui contacter.</em></p>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Ce que contient le dossier</span>
+      <h2>Une base prête à exploiter, pas un fichier brouillon.</h2>
+      <p>Conçue pour les conciergeries, services de ménage, photographes, gestionnaires locatifs, prestataires linge, maintenance et experts LMNP.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat"><div class="ico">Localisé</div><h4>Ville &amp; secteur</h4><p>Chaque propriétaire rattaché à sa zone (Ouest, Sud, Nord, Est), pour prospecter là où vous opérez.</p></div>
+      <div class="feat"><div class="ico">Outillé</div><h4>Scripts inclus</h4><p>Message de prise de contact + séquence de relance en 3 temps, et colonnes de suivi prêtes à l'emploi.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- APERÇU -->
+<section class="section preview">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Aperçu avant achat</span>
+      <h2>Voyez les secteurs. Les coordonnées arrivent par email.</h2>
+      <p>Les localités sont réelles et vérifiées. Les coordonnées des propriétaires ne sont jamais affichées sur cette page — elles vous sont transmises par email après votre demande.</p>
+    </div>
+    <div class="dossier">
+      <div class="dossier-top"><span class="tag">BASE COMPLÈTE — 218 ENTRÉES · PÉRIMÈTRE 974</span><span class="ref mono">CONFIDENTIEL</span></div>
+      <table>
+        <thead><tr><th>Secteur</th><th>Ville</th><th>Statut</th><th>Coordonnées</th></tr></thead>
+        <tbody>
+          <tr><td class="mono" style="color:var(--ember)">Nord</td><td class="city">Saint-Denis</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr><td class="mono" style="color:var(--ember)">Sud</td><td class="city">Saint-Pierre</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr><td class="mono" style="color:var(--ember)">Ouest</td><td class="city">Saint-Paul</td><td><span class="pot">Recensé</span></td><td class="mono" style="color:var(--mist)">✉ par email</td></tr>
+          <tr class="redact"><td><span style="width:46px"></span></td><td><span style="width:150px"></span></td><td><span style="width:70px"></span></td><td><span style="width:80px"></span></td></tr>
+          <tr class="redact"><td><span style="width:40px"></span></td><td><span style="width:120px"></span></td><td><span style="width:70px"></span></td><td><span style="width:80px"></span></td></tr>
+          <tr class="redact"><td><span style="width:52px"></span></td><td><span style="width:170px"></span></td><td><span style="width:70px"></span></td><td><span style="width:80px"></span></td></tr>
+          <tr class="redact"><td><span style="width:44px"></span></td><td><span style="width:130px"></span></td><td><span style="width:70px"></span></td><td><span style="width:80px"></span></td></tr>
+        </tbody>
+      </table>
+      <div class="dossier-foot">
+        <span class="locked">🔒 215 lignes verrouillées · coordonnées transmises par email après commande</span>
+        <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer la base</button>
+      </div>
+    </div>
+    <p class="preview-note">↳ Coordonnées communiquées uniquement par email, après votre demande. Aucun engagement.</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Retours terrain</span>
+      <h2>Déjà utilisé par des pros de la courte durée à La Réunion.</h2>
+    </div>
+    <div class="quotes">
+      <div class="quote"><p>« La base nous a permis d'identifier rapidement des biens sur notre zone prioritaire. On gagne un temps énorme sur la recherche. »</p><div class="who">Conciergerie locale</div><div class="role">Ouest Réunion · nom masqué</div></div>
+      <div class="quote"><p>« Le vrai intérêt, c'est la segmentation. On sait qui contacter, et dans quel ordre. »</p><div class="who">Prestataire courte durée</div><div class="role">Saint-Pierre · nom masqué</div></div>
+      <div class="quote"><p>« On a arrêté de chercher au hasard. Le fichier donne une vraie méthode. »</p><div class="who">Gestionnaire locatif indépendant</div><div class="role">Multi-zones · nom masqué</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI -->
+<section class="section problem">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Le calcul</span>
+      <h2>Un seul propriétaire signé rentabilise toute la base.</h2>
+    </div>
+    <div class="roi-card">
+      <h3>Ce qu'un mandat rapporte vraiment</h3>
+      <ul class="roi-list">
+        <li><b>+</b> Frais de gestion mensuels récurrents</li>
+        <li><b>+</b> Commission sur chaque nuitée réservée</li>
+        <li><b>+</b> Revenus sur la durée du mandat</li>
+        <li><b>+</b> Prestations additionnelles : ménage, linge, maintenance, optimisation</li>
+      </ul>
+      <p class="roi-quote">La vraie question n'est pas « combien coûte le fichier ». C'est <em>« combien me coûte le fait de ne pas contacter ces propriétaires avant mes concurrents ».</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="offres">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center;margin:0 auto 44px">
+      <span class="eyebrow">Offre</span>
+      <h2>Composez votre base. Payez au contact.</h2>
+      <p>50 € le contact. Plus vous en prenez, moins l'unité coûte.</p>
+    </div>
+
+    <div class="offer">
+      <div class="offer-top">
+        <div>
+          <span class="offer-label">Nombre de contacts</span>
+          <div class="offer-qty"><span id="qtyVal">25</span><small>/ 218 disponibles</small></div>
+        </div>
+        <div class="offer-disc" id="discBadge">—</div>
+      </div>
+
+      <input type="range" min="1" max="218" value="25" id="slider" class="slider" aria-label="Nombre de contacts">
+
+      <div class="slider-ticks">
+        <button type="button" onclick="setQty(10)">10</button>
+        <button type="button" onclick="setQty(50)">50</button>
+        <button type="button" onclick="setQty(100)">100</button>
+        <button type="button" onclick="setQty(218)">Toute la base</button>
+      </div>
+
+      <div class="offer-calc">
+        <div class="calc-row"><span>Prix unitaire</span><b id="unitVal">50,00 €</b></div>
+        <div class="calc-row"><span id="discLabel">Aucune remise</span><b id="discVal">—</b></div>
+        <div class="calc-row total"><span>Total HT</span><b id="totalVal">1 250 €</b></div>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="toCheckout()">Procéder au paiement →</button>
+      <p class="offer-note">Paliers dégressifs&nbsp;: dès 10 contacts −10&nbsp;% · dès 50 −20&nbsp;% · base complète −30&nbsp;%</p>
+    </div>
+
+    <div class="bonus" style="justify-content:center">
+      <span><b>Inclus</b> Script de prise de contact</span>
+      <span><b>Inclus</b> Séquence de relance ×3</span>
+      <span><b>Inclus</b> Colonnes de suivi prêtes</span>
+      <span><b>Inclus</b> Guide prospection responsable</span>
+    </div>
+  </div>
+</section>
+
+<!-- PAIEMENT -->
+<section class="section problem" id="paiement">
+  <div class="wrap">
+    <div class="section-head" style="text-align:center;margin:0 auto 40px">
+      <span class="eyebrow">Paiement sécurisé</span>
+      <h2>Validez votre commande.</h2>
+      <p>Les coordonnées complètes des propriétaires sont livrées par email, juste après le paiement.</p>
+    </div>
+    <div class="checkout">
+      <div class="co-summary">
+        <h3>Récapitulatif</h3>
+        <div class="co-row"><span>Contacts sélectionnés</span><b id="coQty">25</b></div>
+        <div class="co-row"><span>Secteur souhaité</span><b id="coZone">—</b></div>
+        <div class="co-row"><span>Prix unitaire</span><b id="coUnit">50,00 €</b></div>
+        <div class="co-row"><span id="coDiscLabel">Remise volume</span><b id="coDisc">—</b></div>
+        <div class="co-row total"><span>Total HT</span><b id="coTotal">1 250 €</b></div>
+        <p class="co-small">TVA non incluse · Aucune coordonnée n'est transmise avant le règlement.</p>
+      </div>
+      <div class="co-pay">
+        <h3>Régler</h3>
+        <p class="co-pay-note">Paiement par carte via prestataire sécurisé. Vos données de carte ne transitent jamais par ce site.</p>
+        <button class="btn btn-primary btn-block" id="payBtn" onclick="pay()">Payer <span id="payAmt">1 250 €</span> →</button>
+        <div class="co-trust">🔒 Paiement chiffré · Garantie satisfait 7 jours</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONES / scarcity -->
+<section class="section zones">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Disponibilité par secteur</span>
+      <h2>L'accès est limité pour préserver la valeur.</h2>
+      <p>Trop diffusé, un secteur perd son intérêt. Certaines zones sont déjà fermées ou bientôt réservées.</p>
+    </div>
+    <div class="zone-grid">
+      <div class="zone"><span class="z-name">SUD · 89 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">OUEST · 57 biens</span><span class="z-stat z-low">Bientôt fermé</span></div>
+      <div class="zone"><span class="z-name">NORD · 52 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">EST · 20 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">EXCL. SAINT-GILLES / LA SALINE</span><span class="z-stat z-low">Sur devis</span></div>
+      <div class="zone"><span class="z-name">EXCL. SAINT-PIERRE / ÉTANG-SALÉ</span><span class="z-stat z-low">Sur devis</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="section">
+  <div class="wrap guard">
+    <div class="seal">
+      <span class="big">7j</span>
+      <small>Satisfait ou remboursé</small>
+    </div>
+    <ul class="guard-list">
+      <li><b>Aperçu gratuit</b><span>Plusieurs lignes visibles avant achat. Vous jugez la qualité par vous-même.</span></li>
+      <li><b>Conformité</b><span>Si le fichier ne correspond pas à la description de l'offre, vous êtes remboursé.</span></li>
+      <li><b>Fraîcheur</b><span>Les lignes manifestement inutilisables sont remplacées dans la limite prévue.</span></li>
+      <li><b>7 jours pour décider</b><span>Vous vérifiez la base. Non conforme à l'annonce ? Remboursement.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section problem">
+  <div class="wrap" style="max-width:820px">
+    <div class="section-head" style="margin:0 auto 48px;text-align:center">
+      <span class="eyebrow">Objections</span>
+      <h2>Les questions que vous vous posez.</h2>
+    </div>
+    <div id="faq">
+      <div class="faq-item open"><button class="faq-q" onclick="toggle(this)">Je peux chercher moi-même gratuitement. Pourquoi payer ?<span class="pm">+</span></button><div class="faq-a"><div>Oui — et vous paierez en temps. La question : préférez-vous passer des heures à chercher, trier et organiser, ou consacrer ce temps à appeler, relancer et signer ? Un seul mandat signé rembourse largement la base.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Les propriétaires vont-ils répondre ?<span class="pm">+</span></button><div class="faq-a"><div>Aucune base ne garantit les réponses. Mais une base bien structurée augmente vos chances de toucher les bons profils, dans les bonnes zones, avec le bon message. La prospection reste un jeu de volume, de ciblage et de relance — d'où les scripts et le tableau de suivi inclus.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Et si mes concurrents l'achètent aussi ?<span class="pm">+</span></button><div class="faq-a"><div>C'est exactement le rôle de l'option d'exclusivité par zone : vous êtes le seul professionnel à exploiter un secteur pendant une période donnée. Elle est limitée et plus chère, mais elle vous donne le terrain. Demandez la disponibilité de votre zone.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Est-ce légal ? Et le RGPD ?<span class="pm">+</span></button><div class="faq-a"><div>La base est destinée à une utilisation professionnelle responsable, à partir d'annonces publiquement visibles. Vous restez responsable de vos campagnes : information claire des personnes contactées, droit d'opposition, messages pertinents, absence de harcèlement. Un guide « prospection responsable » est inclus.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Comment je reçois la base ?<span class="pm">+</span></button><div class="faq-a"><div>Après commande, vous recevez le fichier Excel / Google Sheets par email sous 24 h. Vous l'ouvrez et vous prospectez. Pas de configuration. Le Pack Premium ajoute scripts, tableaux et recommandations de zones.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">À qui s'adresse cette base ?<span class="pm">+</span></button><div class="faq-a"><div>Conciergeries, services de ménage, photographes immobiliers, prestataires linge / maintenance / déco, gestionnaires locatifs, experts LMNP et accompagnement courte durée. Si vous cherchez des propriétaires Airbnb à La Réunion à contacter, elle est pour vous.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="section form-sec" id="form">
+  <div class="wrap">
+    <div class="form-card">
+      <div id="form-live">
+        <h2>Recevoir l'extrait gratuit</h2>
+        <p class="sub">Vous recevez un aperçu de la base. Aucun engagement.</p>
+        <form onsubmit="submitForm(event)">
+          <div class="grid-2">
+            <div class="field"><label for="n">Nom</label><input id="n" required placeholder="Votre nom"></div>
+            <div class="field"><label for="co">Entreprise</label><input id="co" required placeholder="Votre activité"></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="em">Email</label><input id="em" type="email" required placeholder="vous@email.com"></div>
+            <div class="field"><label for="tel">Téléphone</label><input id="tel" type="tel" required placeholder="+262 ..."></div>
+          </div>
+          <div class="grid-2">
+            <div class="field"><label for="act">Activité</label>
+              <select id="act" required>
+                <option value="">Sélectionner</option>
+                <option>Conciergerie</option><option>Service de ménage</option><option>Photographe</option>
+                <option>Linge / maintenance</option><option>Gestion locative</option><option>Expert LMNP</option><option>Autre</option>
+              </select>
+            </div>
+            <div class="field"><label for="zn">Zone recherchée</label>
+              <select id="zn" required>
+                <option value="">Sélectionner</option>
+                <option>Ouest</option><option>Sud</option><option>Nord</option><option>Est</option>
+                <option>Saint-Gilles / La Saline</option><option>Saint-Pierre / Étang-Salé</option><option>Multi-zones</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" type="submit" style="margin-top:8px">Voir l'aperçu masqué →</button>
+          <p class="form-note">Aperçu partiellement masqué · Coordonnées complètes après paiement</p>
+        </form>
+      </div>
+      <div class="ok" id="ok">
+        <div class="check">✓</div>
+        <h3>Aperçu débloqué</h3>
+        <p>Voici 3 propriétaires de la base. Nom et numéro partiellement masqués — on ne donne aucune coordonnée complète sans paiement.</p>
+        <div class="reveal">
+          <table>
+            <thead><tr><th>Secteur</th><th>Propriétaire</th><th>Téléphone</th><th>Détails</th></tr></thead>
+            <tbody>
+              <tr><td class="mono" style="color:var(--ember)">Sud</td><td class="mono">Mme&nbsp;P█████</td><td class="mono">0692&nbsp;57&nbsp;██&nbsp;██</td><td class="redact"><span style="width:84px"></span></td></tr>
+              <tr><td class="mono" style="color:var(--ember)">Sud</td><td class="mono">Mme&nbsp;L█████</td><td class="mono">0692&nbsp;46&nbsp;██&nbsp;██</td><td class="redact"><span style="width:70px"></span></td></tr>
+              <tr><td class="mono" style="color:var(--ember)">Sud</td><td class="mono">Mr&nbsp;M█████</td><td class="mono">0692&nbsp;49&nbsp;██&nbsp;██</td><td class="redact"><span style="width:90px"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="reveal-foot">🔒 Nom complet, numéro entier et reste des coordonnées débloqués après paiement.</div>
+        <button class="btn btn-primary" onclick="toCheckoutFromReveal()">Choisir mon offre →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section class="section final">
+  <div class="wrap">
+    <span class="eyebrow">Dernier appel</span>
+    <h2 style="margin-top:14px">Pendant que vous hésitez, on contacte vos prospects.</h2>
+    <p>Continuez à chercher manuellement, ou démarrez avec une base déjà structurée. À vous de voir qui signe le prochain mandat.</p>
+    <button class="btn btn-primary" onclick="goForm()" style="font-size:15px;padding:18px 34px">Recevoir l'extrait gratuit →</button>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="brand"><span class="mark"></span> VIGIE 974</div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap">
+        <a href="#offres">Offres</a><a href="#faq">FAQ</a><a href="#form">Extrait gratuit</a>
+        <a href="#">Mentions légales</a><a href="#">CGV</a><a href="#">Confidentialité</a>
+      </div>
+    </div>
+    <p class="disclaimer">
+      VIGIE 974 fournit un outil d'aide à la prospection à destination des professionnels de la location courte durée. La base est construite à partir d'informations issues d'annonces publiquement accessibles. L'acheteur demeure seul responsable de ses campagnes et s'engage à respecter les règles applicables : information des personnes contactées, droit d'opposition, pertinence des messages et absence de harcèlement. Les indicateurs de potentiel sont fournis à titre indicatif et ne constituent aucune garantie de résultat commercial. Témoignages anonymisés à la demande des intéressés.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* Evergreen countdown — résiste au rechargement sans dépendre du stockage */
+(function(){
+  var end = Date.now() + (47*3600 + 32*60 + 18)*1000; // ~48h glissantes
+  var d=document.getElementById('d'),h=document.getElementById('h'),m=document.getElementById('m'),s=document.getElementById('s');
+  function p(x){return String(x).padStart(2,'0');}
+  function tick(){
+    var t=Math.max(0,end-Date.now());
+    var ss=Math.floor(t/1000);
+    d.textContent=p(Math.floor(ss/86400));
+    h.textContent=p(Math.floor(ss%86400/3600));
+    m.textContent=p(Math.floor(ss%3600/60));
+    s.textContent=p(ss%60);
+  }
+  tick();setInterval(tick,1000);
+})();
+
+/* FAQ accordéon */
+function toggle(btn){
+  var item=btn.parentElement;
+  var open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});
+  if(!open)item.classList.add('open');
+}
+
+/* Navigation vers le formulaire */
+function goForm(){
+  document.getElementById('form').scrollIntoView({behavior:'smooth'});
+  setTimeout(function(){document.getElementById('n').focus();},500);
+}
+
+/* ===== Offre au curseur : 50 €/contact, paliers dégressifs ===== */
+var UNIT=50, MAX=218, qty=25;
+function tier(n){
+  if(n>=MAX) return {rate:0.30,label:'Base complète −30 %'};
+  if(n>=50)  return {rate:0.20,label:'Remise −20 % (dès 50)'};
+  if(n>=10)  return {rate:0.10,label:'Remise −10 % (dès 10)'};
+  return {rate:0,label:'Aucune remise'};
+}
+function eur(x){return Math.round(x).toLocaleString('fr-FR')+' €';}
+function eur2(x){return x.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function setText(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+function render(){
+  var t=tier(qty), unit=UNIT*(1-t.rate), total=qty*unit, saved=qty*UNIT-total;
+  setText('qtyVal',qty);
+  var sl=document.getElementById('slider'); if(sl) sl.value=qty;
+  var badge=document.getElementById('discBadge');
+  if(badge){badge.textContent=t.rate?('−'+Math.round(t.rate*100)+' %'):'Prix plein';badge.style.opacity=t.rate?1:.45;}
+  setText('unitVal',eur2(unit));
+  setText('discLabel',t.label);
+  setText('discVal',t.rate?('− '+eur(saved)):'—');
+  setText('totalVal',eur(total));
+  setText('coQty',qty);
+  setText('coUnit',eur2(unit));
+  setText('coDiscLabel',t.label);
+  setText('coDisc',t.rate?('− '+eur(saved)):'—');
+  setText('coTotal',eur(total));
+  setText('payAmt',eur(total));
+}
+function setQty(n){qty=Math.min(MAX,Math.max(1,n));render();}
+document.getElementById('slider').addEventListener('input',function(e){qty=parseInt(e.target.value,10);render();});
+render();
+
+function toCheckout(){document.getElementById('paiement').scrollIntoView({behavior:'smooth'});}
+function toCheckoutFromReveal(){document.getElementById('offres').scrollIntoView({behavior:'smooth'});}
+
+/* ===== Paiement Stripe ===== */
+/* Renseignez l'URL de votre endpoint (voir le fichier stripe-vigie974.js à déployer). */
+var STRIPE_ENDPOINT='/api/create-checkout-session';
+var leadEmail='';
+function pay(){
+  var btn=document.getElementById('payBtn');
+  var zone=document.getElementById('coZone').textContent;
+  btn.disabled=true; btn.style.opacity=.6;
+  var prevHtml=btn.innerHTML; btn.innerHTML='Redirection sécurisée…';
+  fetch(STRIPE_ENDPOINT,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contacts:qty, zone:zone, email:leadEmail})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d && d.url){ window.location.href=d.url; }
+    else { throw new Error((d && d.error) || 'Réponse inattendue'); }
+  })
+  .catch(function(err){
+    alert('Paiement momentanément indisponible.\n('+err.message+')\n\nVérifiez que l\'endpoint Stripe est déployé et que STRIPE_ENDPOINT pointe dessus.');
+    btn.disabled=false; btn.style.opacity=1; btn.innerHTML=prevHtml;
+  });
+}
+
+/* Soumission du formulaire — révèle l'aperçu masqué */
+function submitForm(e){
+  e.preventDefault();
+  var zone=document.getElementById('zn').value;
+  leadEmail=document.getElementById('em').value;
+  var data={
+    nom:document.getElementById('n').value,
+    entreprise:document.getElementById('co').value,
+    email:leadEmail,
+    tel:document.getElementById('tel').value,
+    activite:document.getElementById('act').value,
+    zone:zone,
+    date:new Date().toISOString()
+  };
+  console.log('LEAD VIGIE 974 →',data); // remplacer par fetch() vers votre endpoint
+  var cz=document.getElementById('coZone'); if(cz) cz.textContent=zone||'—';
+  document.getElementById('form-live').style.display='none';
+  document.getElementById('ok').classList.add('show');
+}
+</script>
+</body>
+</html>
