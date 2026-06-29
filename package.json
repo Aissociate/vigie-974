@@ -4,6 +4,7 @@
   "private": true,
   "description": "VIGIE 974 — landing + paiement Stripe + livraison email AgentMail (base proprietaires location courte duree, La Reunion).",
   "scripts": {
+    "build": "echo 'No build step required'",
     "start": "node server.js",
     "dev": "node server.js"
   },
