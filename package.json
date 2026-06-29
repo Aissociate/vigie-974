@@ -9,6 +9,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
     "agentmail": "latest",
     "express": "^4.19.2",
     "stripe": "^16.12.0"

@@ -40,9 +40,11 @@ et ne sont plus jamais livrés — ni en exclusif, ni en standard. Les compteurs
 (`218 disponibles`, hero, aperçu) sont recalculés en direct via `GET /api/disponibilite`.
 Exemple : 100 exclusifs vendus → la base affiche `118`.
 
-> ⚠️ Sur Vercel, le système de fichiers des fonctions est éphémère : pour une persistance
-> fiable du registre en production, branchez `lib/registre-exclusifs.js` sur un store durable
-> (Vercel KV / Upstash / Postgres). Surcharge du dossier via la variable `DATA_DIR`.
+**Persistance** : `lib/registre-exclusifs.js` choisit automatiquement son backend :
+- **Supabase** (production) si `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` sont définis →
+  table `exclusifs_vendus` (migration `supabase/migrations/20260629170000_add_exclusifs_vendus.sql`).
+  Persiste réellement, même sur un FS serverless éphémère.
+- **Fichier JSON** (`data/exclusifs-vendus.json`) en repli, pour le dev local et les tests.
 
 ### Garantie
 Satisfait ou remboursé 7 jours, **y compris sur la véracité des informations** : toute fiche
@@ -58,7 +60,7 @@ Test sans dépense : clés `sk_test_…`, carte `4242 4242 4242 4242`.
 
 ## Déploiement Vercel
 1. Importez le dépôt sur vercel.com
-2. Variables d'environnement : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL`, `AGENTMAIL_API_KEY`
+2. Variables d'environnement : `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SITE_URL`, `AGENTMAIL_API_KEY`, et pour la persistance de l'exclusivité `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`
 3. Webhook Stripe → `https://votre-domaine/api/stripe-webhook`, événement `checkout.session.completed`
 4. `index.html` appelle `/api/create-checkout-session` en relatif : rien à changer si tout est sur le même domaine.
 
