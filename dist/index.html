@@ -239,6 +239,19 @@ header{
 .calc-row.total span{font-family:var(--display);font-weight:600;font-size:18px;color:var(--sand)}
 .calc-row.total b{font-family:var(--display);font-weight:800;font-size:30px;color:var(--ember)}
 .offer-note{text-align:center;font-family:var(--mono);font-size:11px;color:var(--mist);margin-top:14px}
+/* ===== Toggle exclusivité ===== */
+.excl-toggle{display:flex;gap:13px;align-items:flex-start;cursor:pointer;border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin-bottom:22px;transition:border-color .2s,background .2s}
+.excl-toggle:hover{border-color:var(--ember)}
+.excl-toggle input{position:absolute;opacity:0;width:0;height:0}
+.excl-box{flex:0 0 auto;width:42px;height:24px;border-radius:999px;background:var(--abyss-2);border:1px solid var(--line);position:relative;margin-top:2px;transition:background .2s,border-color .2s}
+.excl-box::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:var(--mist);transition:transform .2s,background .2s}
+.excl-toggle input:checked + .excl-box{background:rgba(255,90,60,.25);border-color:var(--ember)}
+.excl-toggle input:checked + .excl-box::after{transform:translateX(18px);background:var(--ember)}
+.excl-toggle input:focus-visible + .excl-box{outline:2px solid var(--ember);outline-offset:2px}
+.excl-toggle.on{border-color:var(--ember);background:rgba(255,90,60,.06)}
+.excl-txt b{display:block;font-family:var(--display);font-size:15px;color:var(--sand)}
+.excl-txt small{display:block;font-size:12.5px;color:var(--mist);margin-top:3px;line-height:1.5}
+.excl-x2{font-family:var(--mono);font-size:12px;color:var(--ember);border:1px solid var(--ember);border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:middle}
 
 /* ===== CHECKOUT ===== */
 .checkout{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;max-width:860px;margin:0 auto;align-items:start}
@@ -412,7 +425,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
 
       <div class="hero-trust">
         <span><b>4</b> secteurs couverts</span>
-        <span><b>218</b> propriétaires recensés</span>
+        <span><b id="heroCount">218</b> propriétaires recensés</span>
         <span>MAJ <b>juin 2026</b></span>
       </div>
     </div>
@@ -437,7 +450,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         </tbody>
       </table>
       <div class="dossier-foot">
-        <span class="locked">🔒 215 entrées masquées</span>
+        <span class="locked">🔒 <span id="heroMasked">215</span> entrées masquées</span>
         <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer</button>
       </div>
     </div>
@@ -485,7 +498,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <p>Les localités sont réelles et vérifiées. Les coordonnées des propriétaires ne sont jamais affichées sur cette page — elles vous sont transmises par email après votre demande.</p>
     </div>
     <div class="dossier">
-      <div class="dossier-top"><span class="tag">BASE COMPLÈTE — 218 ENTRÉES · PÉRIMÈTRE 974</span><span class="ref mono">CONFIDENTIEL</span></div>
+      <div class="dossier-top"><span class="tag">BASE COMPLÈTE — <span id="previewCount">218</span> ENTRÉES · PÉRIMÈTRE 974</span><span class="ref mono">CONFIDENTIEL</span></div>
       <table>
         <thead><tr><th>Secteur</th><th>Ville</th><th>Statut</th><th>Coordonnées</th></tr></thead>
         <tbody>
@@ -499,7 +512,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         </tbody>
       </table>
       <div class="dossier-foot">
-        <span class="locked">🔒 215 lignes verrouillées · coordonnées transmises par email après commande</span>
+        <span class="locked">🔒 <span id="previewMasked">215</span> lignes verrouillées · coordonnées transmises par email après commande</span>
         <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer la base</button>
       </div>
     </div>
@@ -555,7 +568,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <div class="offer-top">
         <div>
           <span class="offer-label">Nombre de contacts</span>
-          <div class="offer-qty"><span id="qtyVal">25</span><small>/ 218 disponibles</small></div>
+          <div class="offer-qty"><span id="qtyVal">25</span><small>/ <span id="maxAvail">218</span> disponibles</small></div>
         </div>
         <div class="offer-disc" id="discBadge">—</div>
       </div>
@@ -566,8 +579,17 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         <button type="button" onclick="setQty(10)">10</button>
         <button type="button" onclick="setQty(50)">50</button>
         <button type="button" onclick="setQty(100)">100</button>
-        <button type="button" onclick="setQty(218)">Toute la base</button>
+        <button type="button" onclick="setQty(MAX)">Toute la base</button>
       </div>
+
+      <label class="excl-toggle" for="exclChk">
+        <input type="checkbox" id="exclChk" onchange="setExclusif(this.checked)">
+        <span class="excl-box" aria-hidden="true"></span>
+        <span class="excl-txt">
+          <b>Exclusivité <span class="excl-x2">×2</span></b>
+          <small>Les contacts achetés sortent définitivement de la base : vous êtes le seul à les exploiter. Tarif doublé, même dégressivité.</small>
+        </span>
+      </label>
 
       <div class="offer-calc">
         <div class="calc-row"><span>Prix unitaire</span><b id="unitVal">50,00 €</b></div>
@@ -577,6 +599,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
 
       <button class="btn btn-primary btn-block" onclick="toCheckout()">Procéder au paiement →</button>
       <p class="offer-note">Paliers dégressifs&nbsp;: dès 10 contacts −10&nbsp;% · dès 50 −20&nbsp;% · base complète −30&nbsp;%</p>
+      <p class="offer-note" id="stockNote">Disponibilité en temps réel&nbsp;: <b id="stockDispo">218</b> contacts encore en base.</p>
     </div>
 
     <div class="bonus" style="justify-content:center">
@@ -601,6 +624,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         <h3>Récapitulatif</h3>
         <div class="co-row"><span>Contacts sélectionnés</span><b id="coQty">25</b></div>
         <div class="co-row"><span>Secteur souhaité</span><b id="coZone">—</b></div>
+        <div class="co-row" id="coExclRow" style="display:none"><span>Mode</span><b id="coExcl" style="color:var(--ember)">Exclusivité ×2</b></div>
         <div class="co-row"><span>Prix unitaire</span><b id="coUnit">50,00 €</b></div>
         <div class="co-row"><span id="coDiscLabel">Remise volume</span><b id="coDisc">—</b></div>
         <div class="co-row total"><span>Total HT</span><b id="coTotal">1 250 €</b></div>
@@ -643,10 +667,10 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <small>Satisfait ou remboursé</small>
     </div>
     <ul class="guard-list">
+      <li><b>Véracité des informations</b><span>Coordonnées vérifiées à la source. Toute fiche dont les informations se révèlent fausses ou inexploitables est remplacée — ou remboursée si nous ne pouvons la remplacer.</span></li>
       <li><b>Aperçu gratuit</b><span>Plusieurs lignes visibles avant achat. Vous jugez la qualité par vous-même.</span></li>
       <li><b>Conformité</b><span>Si le fichier ne correspond pas à la description de l'offre, vous êtes remboursé.</span></li>
-      <li><b>Fraîcheur</b><span>Les lignes manifestement inutilisables sont remplacées dans la limite prévue.</span></li>
-      <li><b>7 jours pour décider</b><span>Vous vérifiez la base. Non conforme à l'annonce ? Remboursement.</span></li>
+      <li><b>7 jours pour décider</b><span>Vous vérifiez la base. Coordonnées erronées ou non conforme à l'annonce ? Remboursement.</span></li>
     </ul>
   </div>
 </section>
@@ -783,7 +807,9 @@ function goForm(){
 }
 
 /* ===== Offre au curseur : 50 €/contact, paliers dégressifs ===== */
-var UNIT=50, MAX=218, qty=25;
+/* Exclusivité : tarif ×2, MÊME dégressivité. Les contacts achetés en exclusif
+   sortent de la base — la disponibilité (MAX) est rafraîchie depuis le serveur. */
+var UNIT=50, MAX=218, qty=25, exclusif=false;
 function tier(n){
   if(n>=MAX) return {rate:0.30,label:'Base complète −30 %'};
   if(n>=50)  return {rate:0.20,label:'Remise −20 % (dès 50)'};
@@ -794,11 +820,16 @@ function eur(x){return Math.round(x).toLocaleString('fr-FR')+' €';}
 function eur2(x){return x.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
 function setText(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
 function render(){
-  var t=tier(qty), unit=UNIT*(1-t.rate), total=qty*unit, saved=qty*UNIT-total;
+  var m=exclusif?2:1;
+  var t=tier(qty), unit=UNIT*m*(1-t.rate), total=qty*unit, saved=qty*UNIT*m-total;
   setText('qtyVal',qty);
   var sl=document.getElementById('slider'); if(sl) sl.value=qty;
   var badge=document.getElementById('discBadge');
-  if(badge){badge.textContent=t.rate?('−'+Math.round(t.rate*100)+' %'):'Prix plein';badge.style.opacity=t.rate?1:.45;}
+  if(badge){
+    var pct=t.rate?('−'+Math.round(t.rate*100)+' %'):'Prix plein';
+    badge.textContent=exclusif?(pct+' · Exclusif ×2'):pct;
+    badge.style.opacity=(t.rate||exclusif)?1:.45;
+  }
   setText('unitVal',eur2(unit));
   setText('discLabel',t.label);
   setText('discVal',t.rate?('− '+eur(saved)):'—');
@@ -809,9 +840,36 @@ function render(){
   setText('coDisc',t.rate?('− '+eur(saved)):'—');
   setText('coTotal',eur(total));
   setText('payAmt',eur(total));
+  var er=document.getElementById('coExclRow'); if(er) er.style.display=exclusif?'':'none';
 }
-function setQty(n){qty=Math.min(MAX,Math.max(1,n));render();}
+function setExclusif(on){
+  exclusif=!!on;
+  var chk=document.getElementById('exclChk'); if(chk) chk.checked=exclusif;
+  var lab=document.querySelector('.excl-toggle'); if(lab) lab.classList.toggle('on',exclusif);
+  render();
+}
+function setQty(n){if(!n||n<1)n=1;qty=Math.min(MAX,Math.max(1,n));render();}
 document.getElementById('slider').addEventListener('input',function(e){qty=parseInt(e.target.value,10);render();});
+
+/* ===== Disponibilité en temps réel (base − exclusifs déjà vendus) ===== */
+function applyDispo(d){
+  var disp=(d&&typeof d.disponibles==='number')?d.disponibles:MAX;
+  MAX=Math.max(0,disp);
+  var sl=document.getElementById('slider'); if(sl) sl.max=Math.max(1,MAX);
+  setText('maxAvail',MAX);
+  setText('heroCount',MAX);
+  setText('previewCount',MAX);
+  setText('stockDispo',MAX);
+  setText('heroMasked',Math.max(0,MAX-3));
+  setText('previewMasked',Math.max(0,MAX-3));
+  if(qty>MAX) qty=Math.max(1,MAX);
+  if(MAX<1){
+    setText('stockNote','Base épuisée : tous les contacts ont été vendus en exclusivité.');
+    var pb=document.getElementById('payBtn'); if(pb){pb.disabled=true;pb.style.opacity=.6;}
+  }
+  render();
+}
+fetch('/api/disponibilite').then(function(r){return r.json();}).then(applyDispo).catch(function(){render();});
 render();
 
 function toCheckout(){document.getElementById('paiement').scrollIntoView({behavior:'smooth'});}
@@ -829,7 +887,7 @@ function pay(){
   fetch(STRIPE_ENDPOINT,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contacts:qty, zone:zone, email:leadEmail})
+    body:JSON.stringify({contacts:qty, zone:zone, email:leadEmail, exclusif:exclusif})
   })
   .then(function(r){return r.json();})
   .then(function(d){

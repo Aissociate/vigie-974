@@ -15,11 +15,15 @@ Pub → `index.html` → formulaire → aperçu masqué → curseur d'offre (50 
 ├── server.js               Serveur Express (option sans Vercel)
 ├── api/
 │   ├── create-checkout-session.js   Crée la session de paiement
-│   └── stripe-webhook.js            Reçoit la confirmation Stripe
+│   ├── stripe-webhook.js            Reçoit la confirmation Stripe
+│   └── disponibilite.js             Stock en temps réel (base − exclusifs vendus)
 ├── lib/
 │   ├── stripe-vigie974.js           Prix dégressif (recalculé serveur) + webhook
 │   ├── livraison-vigie974.js        Sélection par secteur + CSV + envoi AgentMail
+│   ├── registre-exclusifs.js        Registre des contacts vendus en exclusivité
 │   └── base-974-complete.csv        Fichier-source (sans DOB / SMS / adresse)
+├── data/
+│   └── exclusifs-vendus.json        Contacts sortis de la base (état runtime)
 └── docs/
     ├── mails-et-scripts.md          Kit prospection + mails du tunnel
     ├── mise-en-ligne.md             Checklist détaillée
@@ -28,6 +32,21 @@ Pub → `index.html` → formulaire → aperçu masqué → curseur d'offre (50 
 
 ## Tarif (recalculé côté serveur, jamais côté navigateur)
 50 € le contact · dès 10 : −10 % · dès 50 : −20 % · toute la base (218) : −30 %.
+
+### Option Exclusivité (×2)
+Toggle « Exclusivité » sur la page : **tarif doublé, même dégressivité**. Les contacts
+achetés en exclusif **sortent définitivement de la base** (registre `data/exclusifs-vendus.json`)
+et ne sont plus jamais livrés — ni en exclusif, ni en standard. Les compteurs du front
+(`218 disponibles`, hero, aperçu) sont recalculés en direct via `GET /api/disponibilite`.
+Exemple : 100 exclusifs vendus → la base affiche `118`.
+
+> ⚠️ Sur Vercel, le système de fichiers des fonctions est éphémère : pour une persistance
+> fiable du registre en production, branchez `lib/registre-exclusifs.js` sur un store durable
+> (Vercel KV / Upstash / Postgres). Surcharge du dossier via la variable `DATA_DIR`.
+
+### Garantie
+Satisfait ou remboursé 7 jours, **y compris sur la véracité des informations** : toute fiche
+dont les coordonnées se révèlent fausses ou inexploitables est remplacée — ou remboursée.
 
 ## Démarrage local
 ```bash

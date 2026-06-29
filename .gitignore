@@ -5,3 +5,6 @@ node_modules/
 .DS_Store
 npm-debug.log*
 .vercel
+
+# État runtime du registre des exclusifs (ne pas versionner — change à chaque vente)
+data/exclusifs-vendus.json

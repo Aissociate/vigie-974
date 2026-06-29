@@ -17,6 +17,7 @@ app.post('/api/stripe-webhook',
 
 app.use(express.json());
 app.post('/api/create-checkout-session', createCheckoutSession);
+app.get('/api/disponibilite', require('./api/disponibilite'));
 
 // Site statique (index.html, merci.html)
 app.use(express.static(__dirname));
