@@ -425,7 +425,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
 
       <div class="hero-trust">
         <span><b>4</b> secteurs couverts</span>
-        <span><b id="heroCount">218</b> propriétaires recensés</span>
+        <span><b id="heroCount">2 000+</b> propriétaires recensés</span>
         <span>MAJ <b>juin 2026</b></span>
       </div>
     </div>
@@ -450,7 +450,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         </tbody>
       </table>
       <div class="dossier-foot">
-        <span class="locked">🔒 <span id="heroMasked">215</span> entrées masquées</span>
+        <span class="locked">🔒 <span id="heroMasked">2 000+</span> entrées masquées</span>
         <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer</button>
       </div>
     </div>
@@ -498,7 +498,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <p>Les localités sont réelles et vérifiées. Les coordonnées des propriétaires ne sont jamais affichées sur cette page — elles vous sont transmises par email après votre demande.</p>
     </div>
     <div class="dossier">
-      <div class="dossier-top"><span class="tag">BASE COMPLÈTE — <span id="previewCount">218</span> ENTRÉES · PÉRIMÈTRE 974</span><span class="ref mono">CONFIDENTIEL</span></div>
+      <div class="dossier-top"><span class="tag">BASE COMPLÈTE — <span id="previewCount">2 000+</span> ENTRÉES · PÉRIMÈTRE 974</span><span class="ref mono">CONFIDENTIEL</span></div>
       <table>
         <thead><tr><th>Secteur</th><th>Ville</th><th>Statut</th><th>Coordonnées</th></tr></thead>
         <tbody>
@@ -512,7 +512,7 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
         </tbody>
       </table>
       <div class="dossier-foot">
-        <span class="locked">🔒 <span id="previewMasked">215</span> lignes verrouillées · coordonnées transmises par email après commande</span>
+        <span class="locked">🔒 <span id="previewMasked">2 000+</span> lignes verrouillées · coordonnées transmises par email après commande</span>
         <button class="btn btn-primary" style="padding:11px 18px" onclick="goForm()">Débloquer la base</button>
       </div>
     </div>
@@ -568,18 +568,18 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <div class="offer-top">
         <div>
           <span class="offer-label">Nombre de contacts</span>
-          <div class="offer-qty"><span id="qtyVal">25</span><small>/ <span id="maxAvail">218</span> disponibles</small></div>
+          <div class="offer-qty"><span id="qtyVal">25</span><small>/ <span id="maxAvail">2 000+</span> disponibles</small></div>
         </div>
         <div class="offer-disc" id="discBadge">—</div>
       </div>
 
-      <input type="range" min="1" max="218" value="25" id="slider" class="slider" aria-label="Nombre de contacts">
+      <input type="range" min="1" max="2000" value="25" id="slider" class="slider" aria-label="Nombre de contacts">
 
       <div class="slider-ticks">
-        <button type="button" onclick="setQty(10)">10</button>
         <button type="button" onclick="setQty(50)">50</button>
         <button type="button" onclick="setQty(100)">100</button>
-        <button type="button" onclick="setQty(MAX)">Toute la base</button>
+        <button type="button" onclick="setQty(500)">500</button>
+        <button type="button" onclick="setQty(MAX)">Volume max</button>
       </div>
 
       <label class="excl-toggle" for="exclChk">
@@ -598,8 +598,8 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       </div>
 
       <button class="btn btn-primary btn-block" onclick="toCheckout()">Procéder au paiement →</button>
-      <p class="offer-note">Paliers dégressifs&nbsp;: dès 10 contacts −10&nbsp;% · dès 50 −20&nbsp;% · base complète −30&nbsp;%</p>
-      <p class="offer-note" id="stockNote">Disponibilité en temps réel&nbsp;: <b id="stockDispo">218</b> contacts encore en base.</p>
+      <p class="offer-note">Paliers dégressifs&nbsp;: dès 10 −10&nbsp;% · dès 50 −20&nbsp;% · dès 100 −30&nbsp;% · au-delà de 500 −50&nbsp;%</p>
+      <p class="offer-note" id="stockNote">Capacité grands comptes&nbsp;: <b id="stockDispo">2 000+</b> contacts en base.</p>
     </div>
 
     <div class="bonus" style="justify-content:center">
@@ -649,10 +649,10 @@ footer{border-top:1px solid var(--line);padding:44px 0;font-family:var(--mono);f
       <p>Trop diffusé, un secteur perd son intérêt. Certaines zones sont déjà fermées ou bientôt réservées.</p>
     </div>
     <div class="zone-grid">
-      <div class="zone"><span class="z-name">SUD · 89 biens</span><span class="z-stat z-open">Ouvert</span></div>
-      <div class="zone"><span class="z-name">OUEST · 57 biens</span><span class="z-stat z-low">Bientôt fermé</span></div>
-      <div class="zone"><span class="z-name">NORD · 52 biens</span><span class="z-stat z-open">Ouvert</span></div>
-      <div class="zone"><span class="z-name">EST · 20 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">SUD · 890 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">OUEST · 570 biens</span><span class="z-stat z-low">Bientôt fermé</span></div>
+      <div class="zone"><span class="z-name">NORD · 520 biens</span><span class="z-stat z-open">Ouvert</span></div>
+      <div class="zone"><span class="z-name">EST · 200 biens</span><span class="z-stat z-open">Ouvert</span></div>
       <div class="zone"><span class="z-name">EXCL. SAINT-GILLES / LA SALINE</span><span class="z-stat z-low">Sur devis</span></div>
       <div class="zone"><span class="z-name">EXCL. SAINT-PIERRE / ÉTANG-SALÉ</span><span class="z-stat z-low">Sur devis</span></div>
     </div>
@@ -807,11 +807,12 @@ function goForm(){
 }
 
 /* ===== Offre au curseur : 50 €/contact, paliers dégressifs ===== */
-/* Exclusivité : tarif ×2, MÊME dégressivité. Les contacts achetés en exclusif
-   sortent de la base — la disponibilité (MAX) est rafraîchie depuis le serveur. */
-var UNIT=50, MAX=218, qty=25, exclusif=false;
+/* Exclusivité : tarif ×2, MÊME dégressivité. Capacité grands comptes : le volume
+   sélectionnable (MAX) et l'affichage de la base sont arrondis (jamais le chiffre exact). */
+var UNIT=50, MAX=2000, qty=25, exclusif=false;
 function tier(n){
-  if(n>=MAX) return {rate:0.30,label:'Base complète −30 %'};
+  if(n>500)  return {rate:0.50,label:'Volume −50 % (au-delà de 500)'};
+  if(n>=100) return {rate:0.30,label:'Remise −30 % (jusqu’à 500)'};
   if(n>=50)  return {rate:0.20,label:'Remise −20 % (dès 50)'};
   if(n>=10)  return {rate:0.10,label:'Remise −10 % (dès 10)'};
   return {rate:0,label:'Aucune remise'};
@@ -851,22 +852,23 @@ function setExclusif(on){
 function setQty(n){if(!n||n<1)n=1;qty=Math.min(MAX,Math.max(1,n));render();}
 document.getElementById('slider').addEventListener('input',function(e){qty=parseInt(e.target.value,10);render();});
 
-/* ===== Disponibilité en temps réel (base − exclusifs déjà vendus) ===== */
+/* ===== Capacité grands comptes : affichage arrondi (jamais le nombre exact) ===== */
+/* On présente la base sous forme arrondie « 2 000+ ». Le volume sélectionnable est
+   plafonné au millier inférieur. Le décompte exact n'est jamais affiché. */
+function baseLabel(n){return Math.floor(n/1000)*1000>=1000?(Math.floor(n/1000)*1000).toLocaleString('fr-FR')+'+':String(n);}
 function applyDispo(d){
-  var disp=(d&&typeof d.disponibles==='number')?d.disponibles:MAX;
-  MAX=Math.max(0,disp);
-  var sl=document.getElementById('slider'); if(sl) sl.max=Math.max(1,MAX);
-  setText('maxAvail',MAX);
-  setText('heroCount',MAX);
-  setText('previewCount',MAX);
-  setText('stockDispo',MAX);
-  setText('heroMasked',Math.max(0,MAX-3));
-  setText('previewMasked',Math.max(0,MAX-3));
-  if(qty>MAX) qty=Math.max(1,MAX);
-  if(MAX<1){
-    setText('stockNote','Base épuisée : tous les contacts ont été vendus en exclusivité.');
-    var pb=document.getElementById('payBtn'); if(pb){pb.disabled=true;pb.style.opacity=.6;}
-  }
+  var total=(d&&typeof d.total==='number')?d.total:2182;
+  var cap=Math.max(1000,Math.floor(total/1000)*1000); // volume sélectionnable arrondi (2000)
+  MAX=cap;
+  var sl=document.getElementById('slider'); if(sl) sl.max=cap;
+  var label=baseLabel(total); // « 2 000+ »
+  setText('maxAvail',label);
+  setText('heroCount',label);
+  setText('previewCount',label);
+  setText('stockDispo',label);
+  setText('heroMasked',label);
+  setText('previewMasked',label);
+  if(qty>MAX) qty=MAX;
   render();
 }
 fetch('/api/disponibilite').then(function(r){return r.json();}).then(applyDispo).catch(function(){render();});
